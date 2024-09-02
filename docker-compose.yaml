@@ -1,0 +1,22 @@
+services:
+  haproxy:
+    container_name: haproxy
+    image: manish8607/docker-challenge-solved-manish:latest
+    ports:
+      - 80:80
+      - 8001:8001
+    depends_on:
+      - cadvisor
+
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.39.3
+    ports:
+      - 8080:8080
+    volumes:
+      - "/:/rootfs"
+      - "/var/run:/var/run"
+      - "/sys:/sys"
+      - "/var/lib/docker/:/var/lib/docker"
+      - "/dev/disk/:/dev/disk"
+    privileged: true

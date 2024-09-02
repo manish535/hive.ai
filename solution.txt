@@ -1,0 +1,39 @@
+1. haproxy is listening on the container port 80, but i can’t access it from localhost outside the container. can you fix it? (you may restart the container for this)
+
+Solution: Run docker container with following cmd to access locally:
+			docker run -d -p 80:80 --name docker-challenge mkassaian/docker-challenge:bug-fixs
+
+2. when you send a GET request to the server, it works only 1/3 times. can you figure out why and fix it from within the container (two parts)? do not change the port numbers the nginx processes listen on or have more than 3 nginx processes running. bonus: can you do it without causing downtime on the haproxy?
+
+Solution: 
+	Update /entrypoint.sh
+		/etc/nginx/nginxo2.conf -> /etc/nginx/nginx02.conf
+
+	Update /usr/local/etc/haproxy/haproxy.cfg:
+		server localhost-01 localhost:8000 -> server localhost-01 localhost:8001
+
+3. edit the http response to say “it works! solved by [name]”. also, create a file called /solution.txt inside your final image with a summary of how you figured out what the issues were and what commands you ran to solve them. then, save it as a new image named “docker-challenge-solved-[name]”. you should be able to run this new image and get the correct response from the api 3/3 times.	
+
+Solution: 
+	Update index.html file @/var/www/html/index.html with "it works! solved by Manish Kumar"
+
+	File saved @/solution.txt with solution.
+
+Note: In addition to that I used "netstat" and "ps" cmds to check wheather process are running on specific port and process are up and running respectevily.
+
+
+
+
+[Final Dockerfile]
+
+FROM mkassaian/docker-challenge
+
+RUN apt update -y && apt install net-tools vim procps -y
+
+COPY entrypoint.sh /entrypoint.sh
+COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+COPY index.html /var/www/html/index.html
+
+EXPOSE 80/tcp
+
+ENTRYPOINT ["bash", "/entrypoint.sh"]
